@@ -1,0 +1,24 @@
+server {
+{% if item.root is defined %}
+    root {{ item.root }};
+{% endif %}
+{% if item.locations is defined %}
+{% for location in item.locations if location.path is defined %}
+
+    location {{ location.path }} {
+{% if location.root is defined %}
+        root {{ location.root }};
+{% endif %}
+{% if location.index is defined %}
+        index {{ location.index }};
+{% endif %}
+{% if location.try_files is defined %}
+        try_files {{ location.try_files }} =404;
+{% endif %}
+{% if location.autoindex is defined and location.autoindex %}
+        autoindex on;
+{% endif %}
+    }
+{% endfor %}
+{% endif %}
+}
