@@ -1,22 +1,30 @@
 server {
-{% if item.root is defined %}
-    root {{ item.root }};
+{% if item.domain is defined %}
+    server_name {{ item.domain }};
+
+    access_log /var/log/nginx/{{ item.name }}.access.log;
+    error_log  /var/log/nginx/{{ item.name }}.error.log warn;
+
+{% endif %}
+{% if item.configuration is defined %}
+{% for cfg in item.configuration %}
+    {{ cfg }};
+{% endfor %}
 {% endif %}
 {% if item.locations is defined %}
-{% for location in item.locations if location.path is defined %}
+{% for location in item.locations %}
+    location {% if location.path is defined %}{{ location.path }}{% else %}/{% endif %} {
+{% if location.configuration is defined %}
+{% for cfg in location.configuration %}
+        {{ cfg }};
+{% endfor %}
+{% endif %}
+{% if proxy_enabled and location.proxy is defined %}
+{% if location.configuration is defined %}
 
-    location {{ location.path }} {
-{% if location.root is defined %}
-        root {{ location.root }};
 {% endif %}
-{% if location.index is defined %}
-        index {{ location.index }};
-{% endif %}
-{% if location.try_files is defined %}
-        try_files {{ location.try_files }} =404;
-{% endif %}
-{% if location.autoindex is defined and location.autoindex %}
-        autoindex on;
+        proxy_pass {{ location.proxy }};
+        include    /etc/nginx/proxy_params;
 {% endif %}
     }
 {% endfor %}

@@ -4,7 +4,3 @@
 
 - include: configure.yml
   tags: [web-server, nginx, configuration, nginx-configuration]
-
-- include: sites.yml
-  when: nginx_sites is defined
-  tags: [web-server, nginx, nginx-site]
