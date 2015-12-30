@@ -1,28 +1,16 @@
 server {
-{% if item.domain is defined %}
-    server_name {{ item.domain }};
+{% if item.ssl is defined %}
+    listen {{ item.ssl.port|default(443) }} ssl;
 
-    access_log /var/log/nginx/{{ item.name }}.access.log;
-    error_log  /var/log/nginx/{{ item.name }}.error.log warn;
+    ssl_protocols       {{ nginx_ssl_protocols }};
+    ssl_certificate     /etc/nginx/ssl/{{ item.name }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ item.name }}.key;
 
-{% endif %}
-{% if item.configuration is defined %}
-{% for cfg in item.configuration %}
-    {{ cfg }};
-{% endfor %}
 {% endif %}
 {% if item.locations is defined %}
 {% for location in item.locations %}
     location {% if location.path is defined %}{{ location.path }}{% else %}/{% endif %} {
-{% if location.configuration is defined %}
-{% for cfg in location.configuration %}
-        {{ cfg }};
-{% endfor %}
-{% endif %}
-{% if proxy_enabled and location.proxy is defined %}
-{% if location.configuration is defined %}
-
-{% endif %}
+{% if location.proxy is defined %}
         proxy_pass {{ location.proxy }};
         include    /etc/nginx/proxy_params;
 {% endif %}

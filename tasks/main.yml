@@ -1,6 +1,72 @@
 ---
-- include: install.yml
-  tags: [web-server, nginx, install, nginx-install]
+- name: add repository
+  yum:
+    name: http://nginx.org/packages/centos/{{ ansible_distribution_major_version }}/noarch/RPMS/nginx-release-centos-{{ ansible_distribution_major_version }}-0.el{{ ansible_distribution_major_version }}.ngx.noarch.rpm
+    state: present
+  tags:
+    - nginx
 
-- include: configure.yml
-  tags: [web-server, nginx, configuration, nginx-configuration]
+- name: install package
+  yum: name=nginx state=present
+  tags:
+    - nginx
+
+- name: copy across proxy_params
+  copy: src=proxy_params dest=/etc/nginx/proxy_params
+  notify:
+    - reload nginx
+  tags:
+    - nginx
+
+- name: create ssl certificate directory
+  file: path=/etc/nginx/ssl state=directory
+  when: nginx_sites|selectattr('ssl', 'defined')|list|length > 0
+  tags:
+    - nginx
+
+- name: copy across certificates
+  copy: src={{ item.ssl.certificate }} dest=/etc/nginx/ssl/{{ item.name }}.crt
+  with_items: nginx_sites
+  when: item.ssl is defined
+  notify:
+    - reload nginx
+  tags:
+    - nginx
+
+- name: copy across certificate keys
+  copy: src={{ item.ssl.certificate_key }} dest=/etc/nginx/ssl/{{ item.name }}.key
+  with_items: nginx_sites
+  when: item.ssl is defined
+  notify:
+    - reload nginx
+  tags:
+    - nginx
+
+- name: register currently present site configurations
+  shell: (cd /etc/nginx/conf.d; ls -1 *.conf) | cut -d'.' -f1
+  register: current_site_list
+  changed_when: false
+  tags:
+    - nginx
+
+- name: remove unmanaged site configurations
+  file: name=/etc/nginx/conf.d/{{ item }}.conf state=absent
+  with_items: current_site_list.stdout_lines
+  when: item not in nginx_sites|map(attribute='name')
+  notify:
+    - reload nginx
+  tags:
+    - nginx
+
+- name: create site configuration files
+  template: src=site.j2 dest=/etc/nginx/conf.d/{{ item.name }}.conf
+  notify:
+    - reload nginx
+  with_items: nginx_sites
+  tags:
+    - nginx
+
+- name: configure nginx as startup service
+  service: name=nginx state=started enabled=yes
+  tags:
+    - nginx
