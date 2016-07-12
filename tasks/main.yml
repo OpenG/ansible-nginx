@@ -24,21 +24,11 @@
   tags:
     - nginx
 
-- name: copy across certificates
-  copy: src={{ item.ssl.certificate }} dest=/etc/nginx/ssl/{{ item.name }}.crt
-  with_items: nginx_sites
-  when: item.ssl is defined
-  notify:
-    - reload nginx
-  tags:
-    - nginx
-
-- name: copy across certificate keys
-  copy: src={{ item.ssl.certificate_key }} dest=/etc/nginx/ssl/{{ item.name }}.key
-  with_items: nginx_sites
-  when: item.ssl is defined
-  notify:
-    - reload nginx
+- name: generate strong diffie-hellman group
+  command: openssl dhparam -out {{ dh_group_key_file }} {{ dh_group_key_size }}
+  when: nginx_sites|selectattr('ssl', 'defined')|list|length > 0
+  args:
+      creates: "{{ dh_group_key_file }}"
   tags:
     - nginx
 
@@ -51,7 +41,7 @@
 
 - name: remove unmanaged site configurations
   file: name=/etc/nginx/conf.d/{{ item }}.conf state=absent
-  with_items: current_site_list.stdout_lines
+  with_items: "{{ current_site_list.stdout_lines }}"
   when: item not in nginx_sites|map(attribute='name')
   notify:
     - reload nginx
@@ -62,7 +52,7 @@
   template: src=site.j2 dest=/etc/nginx/conf.d/{{ item.name }}.conf
   notify:
     - reload nginx
-  with_items: nginx_sites
+  with_items: "{{ nginx_sites }}"
   tags:
     - nginx
 
