@@ -3,8 +3,8 @@ server {
     listen {{ item.ssl.port|default(443) }} ssl;
 
     ssl_protocols       {{ nginx_ssl_protocols }};
-    ssl_certificate     /etc/nginx/ssl/{{ item.name }}.crt;
-    ssl_certificate_key /etc/nginx/ssl/{{ item.name }}.key;
+    ssl_certificate     {{ item.ssl.certificate }};
+    ssl_certificate_key {{ item.ssl.certificate_key }};
     ssl_prefer_server_ciphers {{ ssl_prefer_server_ciphers }};
     ssl_dhparam {{ dh_group_key_file }};
     ssl_ciphers '{{ ssl_ciphers }}';
@@ -17,6 +17,9 @@ server {
 {% if location.proxy is defined %}
         proxy_pass {{ location.proxy }};
         include    /etc/nginx/proxy_params;
+{% endif %}
+{% if location.alias is defined %}
+        alias {{ location.alias }};
 {% endif %}
     }
 {% endfor %}
