@@ -5,7 +5,11 @@ server {
     ssl_protocols       {{ nginx_ssl_protocols }};
     ssl_certificate     /etc/nginx/ssl/{{ item.name }}.crt;
     ssl_certificate_key /etc/nginx/ssl/{{ item.name }}.key;
-
+    ssl_prefer_server_ciphers {{ ssl_prefer_server_ciphers }};
+    ssl_dhparam {{ dh_group_key_file }};
+    ssl_ciphers '{{ ssl_ciphers }}';
+    ssl_stapling {{ ssl_stapling }};
+    ssl_stapling_verify {{ ssl_stapling_verify }};
 {% endif %}
 {% if item.locations is defined %}
 {% for location in item.locations %}
