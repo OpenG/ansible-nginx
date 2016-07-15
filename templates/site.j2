@@ -2,6 +2,11 @@ server {
 {% if item.server_name is defined %}
     server_name {{ item.server_name }};
 {% endif %}
+{% if item.commands is defined %}
+{% for command in item.commands %}
+    {{ command }};
+{% endfor %}
+{% endif %}
 {% if item.ssl is defined %}
     listen {{ item.ssl.port|default(443) }} ssl;
 
@@ -14,9 +19,15 @@ server {
     ssl_stapling {{ ssl_stapling }};
     ssl_stapling_verify {{ ssl_stapling_verify }};
 {% endif %}
+
 {% if item.locations is defined %}
 {% for location in item.locations %}
     location {% if location.path is defined %}{{ location.path }}{% else %}/{% endif %} {
+{% if location.commands is defined %}
+{% for command in location.commands %}
+        {{ command }};
+{% endfor %}
+{% endif %}
 {% if location.proxy is defined %}
         proxy_pass {{ location.proxy }};
         include    /etc/nginx/proxy_params;
