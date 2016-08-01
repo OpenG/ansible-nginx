@@ -16,7 +16,7 @@ server {
     ssl_prefer_server_ciphers {{ ssl_prefer_server_ciphers }};
     ssl_dhparam {{ dh_group_key_file }};
     ssl_ciphers '{{ ssl_ciphers }}';
-    ssl_stapling {{ ssl_stapling }};
+    ssl_stapling_verify {{ item.ssl.stapling_verify|default(ssl_stapling_verify) }};
     ssl_stapling_verify {{ ssl_stapling_verify }};
 {% endif %}
 
