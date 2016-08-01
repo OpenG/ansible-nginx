@@ -10,7 +10,7 @@ server {
 {% if item.ssl is defined %}
     listen {{ item.ssl.port|default(443) }} ssl;
 
-    ssl_protocols       {{ nginx_ssl_protocols }};
+    ssl_protocols       {{ item.ssl.protocols|default(nginx_ssl_protocols) }};
     ssl_certificate     {{ item.ssl.certificate }};
     ssl_certificate_key {{ item.ssl.certificate_key }};
     ssl_prefer_server_ciphers {{ ssl_prefer_server_ciphers }};

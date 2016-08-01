@@ -25,6 +25,7 @@ nginx_ssl_protocols | TLSv1 TLSv1.1 TLSv1.2 | Enables the specified protocols
           ssl:
             certificate: /etc/letsencrypt/live/example.com/fullchain.pem
             certificate_key: /etc/letsencrypt/example.com/privkey.pem            
+            protocols: TLSv1.1 TLSv1.2
           locations:
             - name: "Reverse proxy"
               proxy: http://127.0.0.1:8080            
