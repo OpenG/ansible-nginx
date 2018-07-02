@@ -56,6 +56,16 @@
   tags:
     - nginx
 
+- name: disable server tokens
+  lineinfile:
+    dest: /etc/nginx/nginx.conf
+    regexp: "^    server_tokens "
+    insertafter: "http {"
+    line: "    server_tokens off;"
+  when: disable_server_tokens
+  tags:
+    - nginx
+
 - name: configure nginx as startup service
   service: name=nginx state=started enabled=yes
   tags:
