@@ -42,7 +42,17 @@
 - name: remove unmanaged site configurations
   file: name=/etc/nginx/conf.d/{{ item }}.conf state=absent
   with_items: "{{ current_site_list.stdout_lines }}"
-  when: item not in nginx_sites|map(attribute='name')
+  when: not ((item in nginx_sites|map(attribute='name')) or (item == "_default" ))
+  notify:
+    - reload nginx
+
+  tags:
+    - nginx
+
+- name: create default configuration file
+  template:
+    src: _default.conf.j2
+    dest: /etc/nginx/conf.d/_default.conf
   notify:
     - reload nginx
   tags:
