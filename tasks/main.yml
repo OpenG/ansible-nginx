@@ -56,13 +56,12 @@
   tags:
     - nginx
 
-- name: disable server tokens
-  lineinfile:
-    dest: /etc/nginx/nginx.conf
-    regexp: "^    server_tokens "
-    insertafter: "http {"
-    line: "    server_tokens off;"
-  when: disable_server_tokens
+- name: create default configuration file
+  template:
+    src: _default.conf.j2
+    dest: /etc/nginx/conf.d/_default.conf
+  notify:
+    - reload nginx
   tags:
     - nginx
 
