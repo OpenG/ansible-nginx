@@ -3,11 +3,14 @@
   yum:
     name: http://nginx.org/packages/centos/{{ ansible_distribution_major_version }}/noarch/RPMS/nginx-release-centos-{{ ansible_distribution_major_version }}-0.el{{ ansible_distribution_major_version }}.ngx.noarch.rpm
     state: present
+  when: ansible_os_family == 'RedHat'
   tags:
     - nginx
 
 - name: install package
-  yum: name=nginx state=present
+  package:
+    name: nginx
+    state: present
   tags:
     - nginx
 
@@ -33,7 +36,7 @@
     - nginx
 
 - name: register currently present site configurations
-  shell: (cd /etc/nginx/conf.d; ls -1 *.conf) | cut -d'.' -f1
+  shell: (cd /etc/nginx/conf.d; ls -1 *.conf) | cut -d'.' -f1 | grep --invert-match _default
   register: current_site_list
   changed_when: false
   tags:
@@ -42,10 +45,9 @@
 - name: remove unmanaged site configurations
   file: name=/etc/nginx/conf.d/{{ item }}.conf state=absent
   with_items: "{{ current_site_list.stdout_lines }}"
-  when: not ((item in nginx_sites|map(attribute='name')) or (item == "_default" ))
+  when: item not in nginx_sites|map(attribute='name')
   notify:
     - reload nginx
-
   tags:
     - nginx
 
