@@ -1,3 +1,9 @@
+{% if item.upstream is defined %}
+    upstream {{ item.upstream.name }} {
+    server {{ item.upstream.server }};
+    keepalive {{ item.upstream.keepalive}};
+}
+{% endif %}
 server {
 {% if item.server_name is defined %}
     server_name {{ item.server_name }};
