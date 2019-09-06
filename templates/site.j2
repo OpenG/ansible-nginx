@@ -24,6 +24,7 @@ server {
     ssl_ciphers '{{ ssl_ciphers }}';
     ssl_stapling {{ ssl_stapling }};
     ssl_stapling_verify {{ item.ssl.stapling_verify|default(ssl_stapling_verify) }};
+    resolver 8.8.8.8 8.8.4.4;
 {% endif %}
 
 {% if item.locations is defined %}
