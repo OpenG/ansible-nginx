@@ -14,7 +14,9 @@ nginx_ssl_protocols | TLSv1 TLSv1.1 TLSv1.2 | Enables the specified protocols
 ```yaml
 ---
 - hosts: all
-  sudo: true
+  become: yes
+  become_user: root
+  become_method: sudo
   roles:
     - role: nginx
       nginx_sites:
