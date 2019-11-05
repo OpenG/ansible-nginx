@@ -6,8 +6,8 @@
 {% endif %}
 
 {% if item.limit_req_zones is defined %}
-{% for limit in item.limit_req_zones %}
-{{ limit }};
+{% for definition in item.limit_req_zones %}
+limit_req_zone {{ definition }};
 {% endfor %}
 {% endif %}
 
