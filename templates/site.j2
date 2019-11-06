@@ -4,6 +4,13 @@
     keepalive {{ item.upstream.keepalive}};
 }
 {% endif %}
+
+{% if item.limit_req_zones is defined %}
+{% for definition in item.limit_req_zones %}
+limit_req_zone {{ definition }};
+{% endfor %}
+{% endif %}
+
 server {
 {% if item.server_name is defined %}
     server_name {{ item.server_name }};
