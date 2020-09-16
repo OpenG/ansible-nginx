@@ -14,12 +14,26 @@
   tags:
     - nginx
 
+- name: copy across nginx config
+  copy: src=nginx.conf dest=/etc/nginx/nginx.conf
+  notify:
+  - reload nginx
+  tags:
+  - nginx
+
 - name: copy across proxy_params
   copy: src=proxy_params dest=/etc/nginx/proxy_params
   notify:
     - reload nginx
   tags:
     - nginx
+
+- name: copy across security_headers
+  copy: src=security_headers dest=/etc/nginx/security_headers
+  notify:
+  - reload nginx
+  tags:
+  - nginx
 
 - name: create ssl certificate directory
   file: path=/etc/nginx/ssl state=directory
