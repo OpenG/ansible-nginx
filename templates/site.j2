@@ -21,7 +21,7 @@ server {
 {% endfor %}
 {% endif %}
 {% if item.ssl is defined %}
-    listen {{ item.ssl.port|default(443) }} ssl;
+    listen {{ item.ssl.port|default(443) }} ssl{% if item.ssl.http2 is defined %} http2{% endif %};
 
     ssl_protocols       {{ item.ssl.protocols|default(nginx_ssl_protocols) }};
     ssl_certificate     {{ item.ssl.certificate }};
