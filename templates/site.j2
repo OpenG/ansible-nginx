@@ -10,7 +10,11 @@
 limit_req_zone {{ definition }};
 {% endfor %}
 {% endif %}
+{% if item.raw is defined %}
 
+{{item.raw}}
+
+{% endif %}
 server {
 {% if item.server_name is defined %}
     server_name {{ item.server_name }};
